@@ -4,22 +4,28 @@ using namespace std;
 
 class FileTest{
   public:
-    FileTest():buffer{},ipf{}{}
+    FileTest():filesize{},buffer{},ipf{}{}
+
     void fileprint(){
-      ipf = fopen("track.mp3","r");
+      ipf = fopen("track.wav","rb");
       if(ipf==NULL)perror("Error opening file\n");
       else
       {
-	while(!feof(ipf)){
-	  if(fgets(buffer, 100, ipf)==NULL)break;
-	  fputs(buffer, stdout);
-	}
+	fseek(ipf,0,SEEK_END);
+	filesize=ftell(ipf);
+	fseek(ipf,0,SEEK_SET);
+	//cout << filesize << "\n";
+	buffer=(char*)malloc(filesize);
+	fread(buffer,filesize,1,ipf);
+	fputs(buffer, stdout);
 	fclose(ipf);
       }
     }
+
   private:
     FILE* ipf;
-    char buffer[100];
+    char* buffer;
+    unsigned long filesize;
 };
 int main()
 {
