@@ -1,22 +1,29 @@
 #include <iostream>
+#include <stdio.h>
 using namespace std;
 
-class AudioAnalyse{
+class FileTest{
   public:
-  void testInOut(char[]);
+    FileTest():buffer{},ipf{}{}
+    void fileprint(){
+      ipf = fopen("track.mp3","r");
+      if(ipf==NULL)perror("Error opening file\n");
+      else
+      {
+	while(!feof(ipf)){
+	  if(fgets(buffer, 100, ipf)==NULL)break;
+	  fputs(buffer, stdout);
+	}
+	fclose(ipf);
+      }
+    }
+  private:
+    FILE* ipf;
+    char buffer[100];
 };
-void AudioAnalyse::testInOut(){
-  char[] path = args;
-  FILE *ifp = fopen(path, "r");
-  FILE *ofp = fopen("output.wav", "w");
-  fclose(ifp);
-  fclose(ofp);
-}
-
 int main()
 {
-  AudioAnalyse test;
-  test.testInOut("track.mp3");
-
-  
+  FileTest test;
+  test.fileprint();
+  return 0;
 }
