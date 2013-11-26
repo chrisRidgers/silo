@@ -35,8 +35,10 @@ int loadWaveFile(char *fname){
   }
 
   WavData test;
-  
+  fread(&test.RIFF,4,1,fp);
+  cout<<strlen(test.RIFF)<<endl;
   cout<<test.RIFF<<endl;
+  cout<<strcmp(test.RIFF, "RIFF");
   cout<<test.WAVE<<endl;
   cout<<test.fmt<<endl;
   if(!strcmp(test.RIFF, "RIFF"))
