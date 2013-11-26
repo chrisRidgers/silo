@@ -4,25 +4,28 @@
 #include <string.h>
 using namespace std;
 
-class WavData{
+class Wave{
   public:
-    short* data;
-    unsigned long size;
-
     char RIFF[4];
+    uint32_t filesize;
     char WAVE[4];
     char fmt[4];
+    uint32_t chunksize;
+    uint16_t audioFormat;
+    uint16_t numOfChannels;
+    uint32_t samplesPerSecond;
+    uint32_t bytesPerSecond;
+    uint16_t blockAlign;
+    uint16_t bitsPerSample;
     char subchunk2ID[4];
-    uint32_t fileSize, chunkSize, samplesPerSecond, bytesPerSecond, subchunk2Size;
-    uint16_t audioFormat, numOfChannels, blockAlign, bitsPerSample;
-
-    WavData(){
-    }
+    uint32_t subchunk2Size;
+    
+    Wave(){}
 };
 
 int errormessage(const char* msg, int error=0){
   cout<<msg<<endl;
-  while(cin.get()!=10);
+  //while(cin.get()!=10);
 
   return error;
 }
@@ -34,7 +37,9 @@ int loadWaveFile(char *fname){
     return errormessage("Error: cannot open file");
   }
 
-  WavData test;
+  Wave w; 
+  fread(&w,sizeof(w),1,fp);
+  /*
   fread(&test.RIFF,4,1,fp);
   fread(&test.fileSize,4,1,fp);
   fread(&test.WAVE,4,1,fp);
@@ -49,28 +54,34 @@ int loadWaveFile(char *fname){
   fread(&test.subchunk2ID,4,1,fp);
   fread(&test.subchunk2Size,4,1,fp);
 
-  if(strncmp(test.RIFF, "RIFF",4)!=0)
+  test.soundData = (char*)malloc(test.subchunk2Size);
+  cout<<"hi";
+  fread(&test.soundData, test.subchunk2Size,1,fp);
+  */
+  
+
+  if(strncmp(w.RIFF, "RIFF",4)!=0)
   {
     errormessage("Error: Not RIFF format.\n");
   }
-  if(strncmp(test.WAVE, "WAVE",4)!=0)
+  if(strncmp(w.WAVE, "WAVE",4)!=0)
   {
     errormessage("Error: Not .wav format.\n");
   }
-  if(strncmp(test.fmt, "fmt ",4)!=0)
+  if(strncmp(w.fmt, "fmt ",4)!=0)
   {
     errormessage("Error: fmt error.\n");
   }
 
-  cout<<"File Size: "<<test.fileSize<<endl;
-  cout<<"Chunk Size: "<<test.chunkSize<<endl;
-  cout<<"Format Type: "<<test.audioFormat<<endl;
-  cout<<"Channels: "<<test.numOfChannels<<endl;
-  cout<<"Sample Rate: "<<test.samplesPerSecond<<endl;
-  cout<<"Bytes Per Sec: "<<test.bytesPerSecond<<endl;
-  cout<<"Bits Per Sample: "<<test.bitsPerSample<<endl;
+  cout<<"File Size:\t\t "<<w.filesize<<endl;
+  cout<<"Chunk Size:\t\t "<<w.chunksize<<endl;
+  cout<<"Format Type:\t\t "<<w.audioFormat<<endl;
+  cout<<"Channels:\t\t "<<w.numOfChannels<<endl;
+  cout<<"Sample Rate:\t\t "<<w.samplesPerSecond<<endl;
+  cout<<"Bytes Per Sec:\t\t "<<w.bytesPerSecond<<endl;
+  cout<<"Bits Per Sample:\t "<<w.bitsPerSample<<endl;
 
-  while(cin.get()!=10);
+  //while(cin.get()!=10);
 
 
 
