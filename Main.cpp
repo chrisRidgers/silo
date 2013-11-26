@@ -19,19 +19,18 @@ class Wave{
     uint16_t bitsPerSample;
     char subchunk2ID[4];
     uint32_t subchunk2Size;
+    char* soundData;
     
     Wave(){}
 };
 
 int errormessage(const char* msg, int error=0){
   cout<<msg<<endl;
-  //while(cin.get()!=10);
-
   return error;
 }
 
 int loadWaveFile(char *fname){
-  FILE* fp = fopen(fname,"r");
+  FILE* fp = fopen(fname,"rb");
   if(!fp){
     perror("open");
     return errormessage("Error: cannot open file");
@@ -39,26 +38,10 @@ int loadWaveFile(char *fname){
 
   Wave w; 
   fread(&w,sizeof(w),1,fp);
-  /*
-  fread(&test.RIFF,4,1,fp);
-  fread(&test.fileSize,4,1,fp);
-  fread(&test.WAVE,4,1,fp);
-  fread(&test.fmt,4,1,fp);
-  fread(&test.chunkSize,4,1,fp);
-  fread(&test.audioFormat,2,1,fp);
-  fread(&test.numOfChannels,2,1,fp);
-  fread(&test.samplesPerSecond,4,1,fp);
-  fread(&test.bytesPerSecond,4,1,fp);
-  fread(&test.blockAlign,2,1,fp);
-  fread(&test.bitsPerSample,2,1,fp);
-  fread(&test.subchunk2ID,4,1,fp);
-  fread(&test.subchunk2Size,4,1,fp);
-
-  test.soundData = (char*)malloc(test.subchunk2Size);
-  cout<<"hi";
-  fread(&test.soundData, test.subchunk2Size,1,fp);
-  */
-  
+  w.soundData=(char*)malloc(w.subchunk2Size);
+  cout<<w.soundData<<endl;
+  fseek(fp,44,SEEK_SET);
+  fread(w.soundData, w.subchunk2Size,1,fp);
 
   if(strncmp(w.RIFF, "RIFF",4)!=0)
   {
@@ -80,11 +63,8 @@ int loadWaveFile(char *fname){
   cout<<"Sample Rate:\t\t "<<w.samplesPerSecond<<endl;
   cout<<"Bytes Per Sec:\t\t "<<w.bytesPerSecond<<endl;
   cout<<"Bits Per Sample:\t "<<w.bitsPerSample<<endl;
-
-  //while(cin.get()!=10);
-
-
-
+  cout<<"Sound Data:\t\t "<<w.soundData<<endl;
+  
   return 0;
 }
 int main()
