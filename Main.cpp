@@ -39,12 +39,8 @@ int loadWaveFile(char *fname){
   Wave w; 
   fread(&w,sizeof(w),1,fp);
   w.soundData=(char*)malloc(w.subchunk2Size);
-  cout<<w.soundData<<endl;
   fseek(fp,44,SEEK_SET);
-  if(!(fread(w.soundData, w.subchunk2Size,1,fp))
-      {
-      cout<<"ballsup"<<endl;
-      }
+  cout<<fread(w.soundData, w.subchunk2Size,1,fp)<<endl;
 
   if(strncmp(w.RIFF, "RIFF",4)!=0)
   {
@@ -60,13 +56,13 @@ int loadWaveFile(char *fname){
   }
 
   cout<<"File Size:\t\t "<<w.filesize<<endl;
+  cout<<"Data Size:\t\t "<<w.subchunk2Size<<endl;
   cout<<"Chunk Size:\t\t "<<w.chunksize<<endl;
   cout<<"Format Type:\t\t "<<w.audioFormat<<endl;
   cout<<"Channels:\t\t "<<w.numOfChannels<<endl;
   cout<<"Sample Rate:\t\t "<<w.samplesPerSecond<<endl;
   cout<<"Bytes Per Sec:\t\t "<<w.bytesPerSecond<<endl;
   cout<<"Bits Per Sample:\t "<<w.bitsPerSample<<endl;
-  cout<<"Sound Data:\t\t "<<w.soundData<<endl;
   
   return 0;
 }
