@@ -41,7 +41,10 @@ int loadWaveFile(char *fname){
   w.soundData=(char*)malloc(w.subchunk2Size);
   cout<<w.soundData<<endl;
   fseek(fp,44,SEEK_SET);
-  fread(w.soundData, w.subchunk2Size,1,fp);
+  if(!(fread(w.soundData, w.subchunk2Size,1,fp))
+      {
+      cout<<"ballsup"<<endl;
+      }
 
   if(strncmp(w.RIFF, "RIFF",4)!=0)
   {
