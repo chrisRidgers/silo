@@ -36,20 +36,28 @@ int loadWaveFile(char *fname){
 
   WavData test;
   fread(&test.RIFF,4,1,fp);
-  cout<<strlen(test.RIFF)<<endl;
-  cout<<test.RIFF<<endl;
-  cout<<strcmp(test.RIFF, "RIFF");
-  cout<<test.WAVE<<endl;
-  cout<<test.fmt<<endl;
-  if(!strcmp(test.RIFF, "RIFF"))
+  fread(&test.fileSize,4,1,fp);
+  fread(&test.WAVE,4,1,fp);
+  fread(&test.fmt,4,1,fp);
+  fread(&test.chunkSize,4,1,fp);
+  fread(&test.audioFormat,2,1,fp);
+  fread(&test.numOfChannels,2,1,fp);
+  fread(&test.samplesPerSecond,4,1,fp);
+  fread(&test.bytesPerSecond,4,1,fp);
+  fread(&test.blockAlign,2,1,fp);
+  fread(&test.bitsPerSample,2,1,fp);
+  fread(&test.subchunk2ID,4,1,fp);
+  fread(&test.subchunk2Size,4,1,fp);
+
+  if(strncmp(test.RIFF, "RIFF",4)!=0)
   {
     errormessage("Error: Not RIFF format.\n");
   }
-  if(!strcmp(test.WAVE, "WAVE"))
+  if(strncmp(test.WAVE, "WAVE",4)!=0)
   {
     errormessage("Error: Not .wav format.\n");
   }
-  if(!strcmp(test.fmt, "fmt "))
+  if(strncmp(test.fmt, "fmt ",4)!=0)
   {
     errormessage("Error: fmt error.\n");
   }
@@ -60,6 +68,7 @@ int loadWaveFile(char *fname){
   cout<<"Channels: "<<test.numOfChannels<<endl;
   cout<<"Sample Rate: "<<test.samplesPerSecond<<endl;
   cout<<"Bytes Per Sec: "<<test.bytesPerSecond<<endl;
+  cout<<"Bits Per Sample: "<<test.bitsPerSample<<endl;
 
   while(cin.get()!=10);
 
