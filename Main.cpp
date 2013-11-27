@@ -20,7 +20,7 @@ class Wave{
     char subchunk2ID[4];
     uint32_t subchunk2Size;
     char* soundData;
-    
+
     Wave(){}
 };
 
@@ -37,10 +37,9 @@ int loadWaveFile(char *fname){
   }
 
   Wave w; 
-  fread(&w,sizeof(w),1,fp);
-  w.soundData=(char*)malloc(w.subchunk2Size);
-  fseek(fp,44,SEEK_SET);
-  cout<<fread(w.soundData, w.subchunk2Size,1,fp)<<endl;
+  fread(&w,44,1,fp);
+  w.soundData = (char*)malloc(w.subchunk2Size);
+  cout<<"Number of data records in:\t"<<fread(w.soundData,1,w.subchunk2Size,fp)<<endl;
 
   if(strncmp(w.RIFF, "RIFF",4)!=0)
   {
@@ -54,16 +53,18 @@ int loadWaveFile(char *fname){
   {
     errormessage("Error: fmt error.\n");
   }
+  cout<<"File Size:\t\t\t"<<w.filesize<<endl;
+  cout<<"Data Size:\t\t\t"<<w.subchunk2Size<<endl;
+  cout<<"Chunk Size:\t\t\t"<<w.chunksize<<endl;
+  cout<<"Format Type:\t\t\t"<<w.audioFormat<<endl;
+  cout<<"Channels:\t\t\t"<<w.numOfChannels<<endl;
+  cout<<"Sample Rate:\t\t\t"<<w.samplesPerSecond<<endl;
+  cout<<"Bytes Per Sec:\t\t\t"<<w.bytesPerSecond<<endl;
+  cout<<"Bits Per Sample:\t\t"<<w.bitsPerSample<<endl;
+  cout<<*w.soundData<<endl;
 
-  cout<<"File Size:\t\t "<<w.filesize<<endl;
-  cout<<"Data Size:\t\t "<<w.subchunk2Size<<endl;
-  cout<<"Chunk Size:\t\t "<<w.chunksize<<endl;
-  cout<<"Format Type:\t\t "<<w.audioFormat<<endl;
-  cout<<"Channels:\t\t "<<w.numOfChannels<<endl;
-  cout<<"Sample Rate:\t\t "<<w.samplesPerSecond<<endl;
-  cout<<"Bytes Per Sec:\t\t "<<w.bytesPerSecond<<endl;
-  cout<<"Bits Per Sample:\t "<<w.bitsPerSample<<endl;
-  
+
+
   return 0;
 }
 int main()
