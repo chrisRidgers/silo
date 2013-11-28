@@ -61,7 +61,11 @@ int loadWaveFile(char *fname){
   cout<<"Sample Rate:\t\t\t"<<w.samplesPerSecond<<endl;
   cout<<"Bytes Per Sec:\t\t\t"<<w.bytesPerSecond<<endl;
   cout<<"Bits Per Sample:\t\t"<<w.bitsPerSample<<endl;
-  cout<<*w.soundData<<endl;
+  for(int i=0;i<w.subchunk2Size;i++)
+  {
+    cout<<"Point in sound data:\t"<<i<<"\t"<<w.soundData[i];
+    cout<<endl;
+  }
 
 
 
