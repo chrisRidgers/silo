@@ -1,1 +1,5 @@
-.swp
+*.swp
+*.out
+*.a
+*.o
+*.wav
