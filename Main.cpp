@@ -1,78 +1,61 @@
+#include <ctime>
+#include <fstream>
 #include <iostream>
+#include <iomanip>
+#include <sstream>
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
+#include <vector>
+
+
+enum{APP, SIZEX, SIZEY, INPUT, OUTPUT};
+
 using namespace std;
 
-class Wave{
-  public:
-    char RIFF[4];
-    uint32_t filesize;
-    char WAVE[4];
-    char fmt[4];
-    uint32_t chunksize;
-    uint16_t audioFormat;
-    uint16_t numOfChannels;
-    uint32_t samplesPerSecond;
-    uint32_t bytesPerSecond;
-    uint16_t blockAlign;
-    uint16_t bitsPerSample;
-    char subchunk2ID[4];
-    uint32_t subchunk2Size;
-    char* soundData;
+int saveLandscape();
 
-    Wave(){}
-};
+int sizeX = 1024, sizeY = 1024;
+string pathOut = "output/";
+vector<float> landscape;
 
-int errormessage(const char* msg, int error=0){
-  cout<<msg<<endl;
-  return error;
-}
-
-int loadWaveFile(char *fname){
-  FILE* fp = fopen(fname,"rb");
-  if(!fp){
-    perror("open");
-    return errormessage("Error: cannot open file");
+int main(int argc, const char* argv[])
+{
+  if(argv[SIZEX]!=NULL && argv[SIZEY]!=NULL){
+    sizeX = atoi(argv[SIZEX]);
+    sizeY = atoi(argv[SIZEY]);
   }
+  landscape.resize(sizeX*sizeY*3);
 
-  Wave w; 
-  fread(&w,44,1,fp);
-  w.soundData = (char*)malloc(w.subchunk2Size);
-  cout<<"Number of data records in:\t"<<fread(w.soundData,1,w.subchunk2Size,fp)<<endl;
+  //Defines file output path based on time
+  time_t t = time(0);
+  struct tm * now = localtime(&t);
+  stringstream ss;
+  ss 
+    << now->tm_mday 
+    << now->tm_mon+1 
+    << now->tm_year+1900 
+    << now->tm_hour 
+    << now->tm_min 
+    << now->tm_sec
+    << ".obj";
+  pathOut += ss.str();
 
-  if(strncmp(w.RIFF, "RIFF",4)!=0)
-  {
-    errormessage("Error: Not RIFF format.\n");
-  }
-  if(strncmp(w.WAVE, "WAVE",4)!=0)
-  {
-    errormessage("Error: Not .wav format.\n");
-  }
-  if(strncmp(w.fmt, "fmt ",4)!=0)
-  {
-    errormessage("Error: fmt error.\n");
-  }
-  cout<<"File Size:\t\t\t"<<w.filesize<<endl;
-  cout<<"Data Size:\t\t\t"<<w.subchunk2Size<<endl;
-  cout<<"Chunk Size:\t\t\t"<<w.chunksize<<endl;
-  cout<<"Format Type:\t\t\t"<<w.audioFormat<<endl;
-  cout<<"Channels:\t\t\t"<<w.numOfChannels<<endl;
-  cout<<"Sample Rate:\t\t\t"<<w.samplesPerSecond<<endl;
-  cout<<"Bytes Per Sec:\t\t\t"<<w.bytesPerSecond<<endl;
-  cout<<"Bits Per Sample:\t\t"<<w.bitsPerSample<<endl;
-  for(int i=0;i<w.subchunk2Size;i++)
-  {
-    cout<<"Point in sound data:\t"<<i<<"\t"<<w.soundData[i];
-    cout<<endl;
-  }
+  cout << sizeX << endl;
+  cout << sizeY << endl;
+  cout << landscape.size() << endl;
+  cout << pathOut << endl;
 
-
+  saveLandscape();
 
   return 0;
 }
-int main()
+
+int saveLandscape()
 {
-  loadWaveFile((char *)"track.wav");
+  ofstream output;
+  output.open(pathOut);
+  output << "Hello File World!" << endl;
+  output.close();
   return 0;
 }
