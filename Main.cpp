@@ -15,7 +15,7 @@ enum{APP, SIZEX, SIZEY, INPUT, OUTPUT};
 using namespace std;
 
 int saveLandscape();
-int setupVerts(valarray<float>& ls);
+int setupVerts();
 
 int sizeX = 256, sizeY = 256;
 string pathOut = "output/";
@@ -49,7 +49,7 @@ int main(int argc, const char* argv[])
   cout << landscape.size() << endl;
   cout << pathOut << endl;
 
-  setupVerts(landscape);
+  setupVerts();
  // for(int i=0;i<landscape.size();i++) cout << landscape[i] << endl;
   saveLandscape();
 
@@ -70,7 +70,7 @@ int saveLandscape()
   return 0;
 }
 
-int setupVerts(valarray<float>& ls)
+int setupVerts()
 {
   int countX = 0;
   int countY = 0;
@@ -88,16 +88,13 @@ int setupVerts(valarray<float>& ls)
     }
     //countX = countX>=1023 ? 0 : countX++;
   }
-                
-  for(int i=1; i<landscape.size(); i+=15)
-  {
-   valarray<float> tempY = ls[slice(i,5,3)];
-   cout << countY << endl;
-   tempY=countY;
-   countY++;
-  }
-  
 
+  for(int i=1; i<landscape.size(); i+=sizeY)
+  {
+    landscape[slice(i,sizeY,3)] = countY;
+    cout << countY << endl;
+    countY++;
+  }
 
   return 0;
 }
