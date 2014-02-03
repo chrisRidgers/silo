@@ -50,8 +50,10 @@ int main(int argc, const char* argv[])
   cout << pathOut << endl;
 
   setupVerts();
+  cout << "setupVerts complete" << endl;
  // for(int i=0;i<landscape.size();i++) cout << landscape[i] << endl;
   saveLandscape();
+  cout << "saveLandscape complete" << endl;
 
   return 0;
 }
@@ -59,12 +61,22 @@ int main(int argc, const char* argv[])
 int saveLandscape()
 {
   ofstream output;
+  cout << "Landscape Test1" << endl;
   output.open(pathOut);
-  output << "Hello File World!" << endl;
+  if(output.is_open())
+  {
+  cout << "Landscape Test2" << endl;
+  output << "Hello File World!\n";
+  }else
+  {
+    return 1;
+  }
+  
   for(int i=0; i<landscape.size(); i+=3)
   {
     valarray<float> vert = landscape[slice(i,3,1)];
-    output << "v\t" << vert[0] << "\t" << vert[1] << "\t" << vert[2] << endl;
+    cout << "v\t" << vert[0] << "\t" << vert[1] << "\t" << vert[2] << "\n";
+    output << "v\t" << vert[0] << "\t" << vert[1] << "\t" << vert[2] << "\n";
   }
   output.close();
   return 0;
@@ -78,16 +90,17 @@ int setupVerts()
   for(int i=0; i<landscape.size(); i+=3)
   {
     landscape[i]=countX;
-    countX = countX>=sizeX ? 0 : countX+=1;
+    countX = countX>=sizeX-1 ? 0 : countX+=1;
   }
 
+  countX = 0;
+       
   for(int i=1; i<landscape.size(); i+=sizeY)
   {
     landscape[slice(i,sizeY,3)] = countY;
-    countY = countX>=sizeX ? countY+=1 : countY;
-    countX = countX>=sizeX ? 0 : countX+=1;
-
+    countY = countX>=sizeX-1 ? countY+=1 : countY;
+    countX = countX>=sizeX-1 ? 0 : countX+=1;
   }
-
+        
   return 0;
 }
