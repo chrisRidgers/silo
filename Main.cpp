@@ -77,23 +77,16 @@ int setupVerts()
 
   for(int i=0; i<landscape.size(); i+=3)
   {
-    //cout << countX << endl;
     landscape[i]=countX;
-    if(countX >= 1023)
-    {
-      countX = 0;
-    }else
-    {
-      countX++;
-    }
-    //countX = countX>=1023 ? 0 : countX++;
+    countX = countX>=sizeX ? 0 : countX+=1;
   }
 
   for(int i=1; i<landscape.size(); i+=sizeY)
   {
     landscape[slice(i,sizeY,3)] = countY;
-    cout << countY << endl;
-    countY++;
+    countY = countX>=sizeX ? countY+=1 : countY;
+    countX = countX>=sizeX ? 0 : countX+=1;
+
   }
 
   return 0;
