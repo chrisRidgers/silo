@@ -27,7 +27,7 @@ int main(int argc, const char* argv[])
     sizeX = atoi(argv[SIZEX]);
     sizeY = atoi(argv[SIZEY]);
   }
-  landscape.resize(sizeX*sizeY*3);
+  landscape.resize((sizeX-1)*(sizeY-1)*3);
 
   //Defines file output path based on time
   time_t t = time(0);
@@ -51,7 +51,7 @@ int main(int argc, const char* argv[])
 
   setupVerts();
   cout << "setupVerts complete" << endl;
- // for(int i=0;i<landscape.size();i++) cout << landscape[i] << endl;
+  // for(int i=0;i<landscape.size();i++) cout << landscape[i] << endl;
   saveLandscape();
   cout << "saveLandscape complete" << endl;
 
@@ -65,18 +65,30 @@ int saveLandscape()
   output.open(pathOut);
   if(output.is_open())
   {
-  cout << "Landscape Test2" << endl;
-  output << "Hello File World!\n";
+    cout << "Landscape Test2" << endl;
+    //output << "Hello File World!\n";
   }else
   {
     return 1;
   }
-  
-  for(int i=0; i<landscape.size(); i+=3)
+
+  for(int i=0; i<landscape.size()-1; i+=3)
   {
     valarray<float> vert = landscape[slice(i,3,1)];
     cout << "v\t" << vert[0] << "\t" << vert[1] << "\t" << vert[2] << "\n";
     output << "v\t" << vert[0] << "\t" << vert[1] << "\t" << vert[2] << "\n";
+  }
+
+  output << "\n";
+  /*
+     for(int i=1; i<sizeX*sizeY-sizeX; i++)
+     {
+     cout << "f\t" << i << " " << i+sizeX << " " << i+sizeX+1 << " " << i+1 << " \n";
+     output << "f\t" << i << " " << i+sizeX << " " << i+sizeX+1 << " " << i+1 << " \n";
+     }
+   */
+  for(int i=1; i<landscape.size()/3-sizeX-1; i++){
+    if(i%sizeX!=0)output << "f\t" << i << " " << i+sizeX << " " << i+sizeX+1 << " " << i+1 << " \n";
   }
   output.close();
   return 0;
@@ -94,13 +106,12 @@ int setupVerts()
   }
 
   countX = 0;
-       
-  for(int i=1; i<landscape.size(); i+=sizeY)
+
+  for(int i=1; i<landscape.size(); i+=sizeY*3)
   {
     landscape[slice(i,sizeY,3)] = countY;
-    countY = countX>=sizeX-1 ? countY+=1 : countY;
-    countX = countX>=sizeX-1 ? 0 : countX+=1;
+    countY++;
   }
-        
+
   return 0;
 }
