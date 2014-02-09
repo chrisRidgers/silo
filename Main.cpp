@@ -107,6 +107,8 @@ int setupVerts()
   }
 
   //countX = 0;
+  //
+  //test
 
   for(int i=1; i<landscape.size(); i+=sizeY*3)
   {
