@@ -96,8 +96,8 @@ int saveLandscape()
 
 int setupVerts()
 {
-  int countX = 0;
-  int countY = 0;
+  float countX = 0.f;
+  float countY = 0.f;
 
   for(int i=0; i<landscape.size(); i+=3)
   {
