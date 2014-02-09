@@ -75,7 +75,7 @@ int saveLandscape()
   for(int i=0; i<landscape.size()-1; i+=3)
   {
     valarray<float> vert = landscape[slice(i,3,1)];
-    cout << "v\t" << vert[0] << "\t" << vert[1] << "\t" << vert[2] << "\n";
+    //cout << "v\t" << vert[0] << "\t" << vert[1] << "\t" << vert[2] << "\n";
     output << "v\t" << vert[0] << "\t" << vert[1] << "\t" << vert[2] << "\n";
   }
 
@@ -96,21 +96,22 @@ int saveLandscape()
 
 int setupVerts()
 {
-  float countX = 0.f;
-  float countY = 0.f;
+  int countX = 0;
+  int countY = 0;
 
   for(int i=0; i<landscape.size(); i+=3)
   {
     landscape[i]=countX;
-    countX = countX>=sizeX-1 ? 0 : countX+=1;
+    countX = countX>=(sizeX-1) ? 0 : countX+=1;
+    cout << countX << endl;
   }
 
-  countX = 0;
+  //countX = 0;
 
   for(int i=1; i<landscape.size(); i+=sizeY*3)
   {
     landscape[slice(i,sizeY,3)] = countY;
-    countY++;
+    countY+=1;
   }
 
   return 0;
