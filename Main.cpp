@@ -87,22 +87,20 @@ int saveLandscape()
      output << "f\t" << i << " " << i+sizeX << " " << i+sizeX+1 << " " << i+1 << " \n";
      }
    */
-  for(int i=1; i<landscape.size()/3-sizeX-1; i++){
-    if(i%sizeX!=0)output << "f\t" << i << " " << i+sizeX << " " << i+sizeX+1 << " " << i+1 << " \n";
-  }
+  for(int i=1; i<landscape.size()/3-sizeX-1; i++){ if(i%sizeX!=0)output << "f\t" << i << " " << i+sizeX << " " << i+sizeX+1 << " " << i+1 << " \n"; }
   output.close();
   return 0;
 }
 
 int setupVerts()
 {
-  int countX = 0;
-  int countY = 0;
+  float countX = 0.0f;
+  float countY = 0.0f;
 
   for(int i=0; i<landscape.size(); i+=3)
   {
-    landscape[i]=countX;
-    countX = countX>=(sizeX-1) ? 0 : countX+=1;
+    landscape[i]=countX/16;
+    countX = countX>=((sizeX)-1) ? 0 : countX+=1;
     cout << countX << endl;
   }
 
@@ -112,7 +110,7 @@ int setupVerts()
 
   for(int i=1; i<landscape.size(); i+=sizeY*3)
   {
-    landscape[slice(i,sizeY,3)] = countY;
+    landscape[slice(i,sizeY,3)] = countY/16;
     countY+=1;
   }
 
