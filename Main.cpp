@@ -1,14 +1,15 @@
 #include <ctime>
+#include <fftw3.h>
 #include <fstream>
-#include <iostream>
 #include <iomanip>
+#include <iostream>
+#include <sndfile.h>
 #include <sstream>
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
 #include <valarray>
 #include <vector>
-#include <sndfile.h>
 
 
 enum{APP, SIZEX, SIZEY, INPUT, OUTPUT};
@@ -18,7 +19,6 @@ using namespace std;
 int saveLandscape();
 int setupVerts();
 int soundInput();
-
 
 int sizeX = 256, sizeY = 256;
 char *infilename;
