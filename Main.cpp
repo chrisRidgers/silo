@@ -1,3 +1,4 @@
+#include <complex.h>
 #include <ctime>
 #include <fftw3.h>
 #include <fstream>
@@ -19,6 +20,7 @@ using namespace std;
 int saveLandscape();
 int setupVerts();
 int soundInput();
+int testfftw();
 
 int sizeX = 256, sizeY = 256;
 char *infilename;
@@ -71,6 +73,8 @@ int main(int argc, const char* argv[])
   cout << "Format:\t\t\t" << sfinfo.format<< endl;
   cout << "Sections:\t\t\t" << sfinfo.sections<< endl;
   cout << "Seekable:\t\t\t" << sfinfo.seekable<< endl;
+  
+  testfftw();
 
   return 0;
 }
@@ -145,4 +149,38 @@ int soundInput()
 	{
 		return 0;
 	}
+}
+
+int testfftw()
+{
+  double *in;
+  fftw_complex *out;
+  fftw_plan p, p2;
+
+  in = (double*) fftw_malloc(256*256 * sizeof(double));
+  out = (fftw_complex*) fftw_malloc(256*256 * sizeof(fftw_complex));
+
+  for(int i=0; i<256; i++)
+  {
+    srand(time(NULL));
+    in[i] = rand()%255;
+  }
+
+  p = fftw_plan_dft_r2c_2d(256, 256, in, out, FFTW_ESTIMATE);
+
+  fftw_execute(p);
+
+  for(int i=0; i<256; i++)
+  {
+   // out[i][0] = 1/
+  }
+
+  p2 = fftw_plan_dft_c2r_2d(256, 256, out, in, FFTW_ESTIMATE);
+
+  fftw_destroy_plan(p);
+  fftw_destroy_plan(p2);
+  fftw_free(in);
+  fftw_free(out);
+
+  return 0;
 }
