@@ -160,19 +160,20 @@ int testfftw()
   in = (double*) fftw_malloc(256*256 * sizeof(double));
   out = (fftw_complex*) fftw_malloc(256*256 * sizeof(fftw_complex));
 
-  for(int i=0; i<256; i++)
-  {
     srand(time(NULL));
+  for(int i=0; i<256*256; i++)
+  {
     in[i] = rand()%255;
+    cout << "in test " << i << " value: " << in[i] << endl;
   }
 
   p = fftw_plan_dft_r2c_2d(256, 256, in, out, FFTW_ESTIMATE);
 
   fftw_execute(p);
 
-  for(int i=0; i<256; i++)
+  for(int i=0; i<256*256; i++)
   {
-   // out[i][0] = 1/
+   // out[i][0] = 1/(sqrt(x^2+y^2)^p)
   }
 
   p2 = fftw_plan_dft_c2r_2d(256, 256, out, in, FFTW_ESTIMATE);
