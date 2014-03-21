@@ -2,6 +2,7 @@ GPP= g++
 INCLUDE= -Iinclude/
 LIB= -Llib/ 
 LIBS= -lsndfile -lfftw3 -lm
+STD= --std=gnu++11
 
 default: silo.out
 
@@ -9,7 +10,7 @@ silo.out: silo.o
 	$(GPP) $(LIB) $(LIBS) silo.o -o silo.out
 
 silo.o: Main.cpp
-	$(GPP) $(INCLUDE) -c Main.cpp -o silo.o
+	$(GPP) $(STD) $(INCLUDE) -c Main.cpp -o silo.o
 
 clean:
 	rm *.o
