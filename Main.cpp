@@ -118,11 +118,17 @@ int saveLandscape()
   /*
      for(int i=1; i<sizeX*sizeY-sizeX; i++)
      {
-     cout << "f\t" << i << " " << i+sizeX << " " << i+sizeX+1 << " " << i+1 << " \n";
-     output << "f\t" << i << " " << i+sizeX << " " << i+sizeX+1 << " " << i+1 << " \n";
+     cout << "f\t" << i << " " << i+sizeX << " " << i+sizeX+1 << " " << i+1 
+     << " \n";
+     output << "f\t" << i << " " << i+sizeX << " " << i+sizeX+1 << " " << i+1 
+     << " \n";
      }
      */
-  for(int i=1; i<landscape.size()/3-sizeX-1; i++){ if(i%sizeX!=0)output << "f\t" << i << " " << i+sizeX << " " << i+sizeX+1 << " " << i+1 << " \n"; }
+  for(int i=1; i<landscape.size()/3-sizeX-1; i++)
+  { 
+    if(i%sizeX!=0)output << "f\t" << i << " " << i+sizeX << " " << i+sizeX+1 
+      << " " << i+1 << " \n"; 
+  }
   output.close();
   return 0;
 }
@@ -132,10 +138,10 @@ int setupVerts()
   float countX = 0.0f;
   float countY = 0.0f;
 
-  for(int i=0; i<landscape.size(); i+=3)
+  for(int i = 0; i < landscape.size(); i += 3)
   {
-    landscape[i]=countX/16;
-    countX = countX>=((sizeX)-1) ? 0 : countX+=1;
+    landscape[i] 	= countX / 16;
+    countX 		= countX >= ((sizeX)-1) ? 0 : countX+=1;
     //cout << countX << endl;
   }
 
@@ -143,10 +149,10 @@ int setupVerts()
   //
   //test
 
-  for(int i=1; i<landscape.size(); i+=sizeY*3)
+  for(int i = 1; i < landscape.size(); i += sizeY * 3)
   {
-    landscape[slice(i,sizeY,3)] = countY/16;
-    countY+=1;
+    landscape[slice(i, sizeY, 3)] 	= countY / 16;
+    countY 				+= 1;
   }
 
   return 0;
@@ -168,16 +174,16 @@ int soundInput()
 int testfftw()
 {
   fftw_complex  *in;
-  fftw_complex *out;
-  fftw_plan p, p2;
+  fftw_complex 	*out;
+  fftw_plan 	p, p2;
 
-  in = (fftw_complex*) fftw_malloc(256*256 * sizeof(fftw_complex));
-  out = (fftw_complex*) fftw_malloc(256*256 * sizeof(fftw_complex));
+  in 	= (fftw_complex*) fftw_malloc(256 * 256 * sizeof(fftw_complex));
+  out 	= (fftw_complex*) fftw_malloc(256 * 256 * sizeof(fftw_complex));
 
   srand(time(NULL));
-  for(int i=0; i<256*256; i++)
+  for(int i = 0; i < 256 * 256; i++)
   {
-    in[i][0] = rand()%255;
+    in[i][0] = rand() % 255;
     //cout << "in test " << i << " value: " << in[i] << endl;
   }
 
@@ -191,8 +197,8 @@ int testfftw()
   
   for(int i = 0; i < 256 * 256; i++)
   {
-    out[i][0] = 1.0 / (256) * out[i][0];
-    out[i][1] = 1.0 / (256) * out[i][1];
+    out[i][0] = 1.0 / 255 * out[i][0];
+    out[i][1] = 1.0 / 255 * out[i][1];
   }
   drawAllegro(out, 256 * 256);
 
@@ -239,8 +245,7 @@ int initialiseAllegro()
     return -1;
   }
 
-  al_clear_to_color(al_map_rgba_f(0,0,0, 0.1));
-
+  al_clear_to_color(al_map_rgba_f(0, 0, 0, 0.1));
   al_flip_display();
 
   return 0;
@@ -255,10 +260,10 @@ int closeAllegro()
 
 int drawAllegro(fftw_complex *in, int size)
 {
-  int sizeX = 256;
-  int sizeY = 256;
-  int posX = 1;
-  int posY = 1;
+  int sizeX 	= 256;
+  int sizeY 	= 256;
+  int posX 	= 1;
+  int posY 	= 1;
 
   for(int i = 0; i < size; i++)
   {
@@ -296,10 +301,11 @@ int drawAllegro(fftw_complex *in, int size)
 
 int scaleFreq(fftw_complex *in, int size)
 {
-  int sizeX = 256;
-  int sizeY = 256;
-  int posX = 1;
-  int posY = 1;
+  int sizeX 	= 256;
+  int sizeY 	= 256;
+  int posX 	= 1;
+  int posY 	= 1;
+  
   for(int i = 0; i < size; i++)
   {
     in[i][0] *= 1.0/pow(posX + posY, 1.4);
@@ -317,23 +323,23 @@ int scaleFreq(fftw_complex *in, int size)
 }
 int offsetFreq(fftw_complex *in, int size)
 {
-  int sizeX = 256;
-  int sizeY = 256;
-  int posX = 1;
-  int posY = 1;
+  int sizeX 	= 256;
+  int sizeY 	= 256;
+  int posX 	= 1;
+  int posY 	= 1;
 
-  for(int i = 0; i < size/2; i++)
+  for(int i = 0; i < size / 2; i++)
   {
     fftw_complex temp;
     
-    temp[0] = in[i][0];
-    temp[1] = in[i][1];
+    temp[0] 		= in[i][0];
+    temp[1] 		= in[i][1];
 
-    in[i][0] = in[i+size/2][0];
-    in[i][1] = in[i+size/2][1];
+    in[i][0] 		= in[i+size/2][0];
+    in[i][1] 		= in[i+size/2][1];
 
-    in[i+size/2][0] = temp[0];
-    in[i+size/2][1] = temp[1];
+    in[i+size/2][0] 	= temp[0];
+    in[i+size/2][1] 	= temp[1];
 
     posX++;
     if(posX > sizeX)
@@ -345,7 +351,7 @@ int offsetFreq(fftw_complex *in, int size)
   
   for(posY = 1;  posY < sizeY; posY++)
   {
-    for(posX = 1; posX < sizeX/2; posX++)
+    for(posX = 1; posX < sizeX / 2; posX++)
     {
       fftw_complex temp;
       fprintf(
@@ -356,14 +362,17 @@ int offsetFreq(fftw_complex *in, int size)
 	 posY, posX);
 	  
 
-      temp[0] = in[posY * sizeX + posX][0];
-      temp[1] = in[posY * sizeX + posX][1];
+      temp[0] 					= in[posY * sizeX + posX][0];
+      temp[1] 					= in[posY * sizeX + posX][1];
 
-      in[posY * sizeX + posX][0] = in[posY * sizeX + posX + sizeX/2][0];
-      in[posY * sizeX + posX][1] = in[posY * sizeX + posX + sizeX/2][1];
+      in[posY * sizeX + posX][0] 		= 
+	in[posY * sizeX + posX + sizeX/2][0];
+      
+      in[posY * sizeX + posX][1] 		= 
+	in[posY * sizeX + posX + sizeX/2][1];
 
-      in[posY * sizeX + posX + sizeX/2][0] = temp[0];
-      in[posY * sizeX + posX + sizeX/2][1] = temp[1]; 
+      in[posY * sizeX + posX + sizeX/2][0] 	= temp[0];
+      in[posY * sizeX + posX + sizeX/2][1] 	= temp[1]; 
     }
   }
 
