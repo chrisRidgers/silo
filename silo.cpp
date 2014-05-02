@@ -17,25 +17,20 @@ int main(int argc, char **argv)
   //generateLandscape(&global);
   
   sf_seek(global.getInfile(), global.getSeek(), SEEK_SET);
-  long test = sf_read_float(global.getInfile(), global.getSoundSamplesBuffer(), 
+  sf_read_float(global.getInfile(), global.getSoundSamplesBuffer(), 
       global.getWidth() * global.getHeight() * global.getInInfo()->channels);
-
-  //fprintf(stdout, "frames read: %ld \n", test);
-  //fprintf(stdout, "MaxSeek: %ld \n", global.getMaxSeek());
-  //fprintf(stdout, "Seek: %ld \n", global.getSeek());
   
   averageChannels(&global);
-
+  
   drawAllegro(global.getImageBuffer(), &global);
   
   fftw_execute(*global.getPlan());
   drawAllegro(global.getImageBuffer2(), &global);
-
   scaleFreq(global.getImageBuffer2(), &global);
   drawAllegro(global.getImageBuffer2(), &global);
-
   fftw_execute(*global.getPlan2());
   drawAllegro(global.getImageBuffer(), &global);
+  
 
   closeAllegro(&global);
 
@@ -176,7 +171,8 @@ int drawAllegro(fftw_complex *in, global *global)
 	out[a] \t %f \n \
 	out[b] \t %f \n \
 	big \t %f \n \
-	small \t %f \n",
+	small \t %f \n \
+	valueMapped \t %f \n",
 	posX,
 	posY,
 	in[i][0],
@@ -184,14 +180,17 @@ int drawAllegro(fftw_complex *in, global *global)
 	abs(z),
 	sqrt(pow(in[i][0], 2) + pow(in[i][1], 2)),
 	big,
-	small);
+	small,
+	mapValue(abs(z), small, big, 0.0, 255.0));
     
     al_draw_line(
 	posX + 0.5, 
 	posY, 
 	posX + 0.5, 
 	posY + 1, 
-	al_map_rgb(abs(z), abs(z), abs(z)), 
+	al_map_rgb(mapValue(abs(z), small, big, 0.0, 255.0),
+	  mapValue(abs(z), small, big, 0.0, 255.0), 
+	  mapValue(abs(z), small, big, 0.0, 255.0)), 
 	1);
     
     posX++;
@@ -222,8 +221,8 @@ int scaleFreq(fftw_complex *in, global *global)
     double r = sqrt(pow(posX, 2) + pow(posY, 2));
     if(r != 0.0)
     {
-      in[i][0] *= 1.0/pow(r, 1.8);
-      in[i][1] *= 1.0/pow(r, 1.8);
+      in[i][0] *= 1.0/pow(r, 2.0);
+      in[i][1] *= 1.0/pow(r, 2.0);
     }
     else
     {
@@ -295,4 +294,14 @@ int averageChannels(global *global)
     global->getImageBuffer()[i][0] /= global->getInInfo()->channels;
   }
   return 0;
+}
+
+float mapValue(float value, float oldMin, float oldMax, float newMin, float newMax)
+{
+  float oldRange = oldMax - oldMin;
+  float newRange = newMax - newMin;
+
+  float mapped = value - newMin / oldRange * newRange + newMin;
+
+  return mapped;
 }
