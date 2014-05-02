@@ -161,6 +161,7 @@ int drawAllegro(fftw_complex *in, global *global)
   for(int i = 0; i < size; i++)
   {
     complex<double> z(in[i][0], in[i][1]);
+    /*
     fprintf(
 	stdout, 
 	"\
@@ -171,8 +172,7 @@ int drawAllegro(fftw_complex *in, global *global)
 	out[a] \t %f \n \
 	out[b] \t %f \n \
 	big \t %f \n \
-	small \t %f \n \
-	valueMapped \t %f \n",
+	small \t %f \n",
 	posX,
 	posY,
 	in[i][0],
@@ -180,17 +180,15 @@ int drawAllegro(fftw_complex *in, global *global)
 	abs(z),
 	sqrt(pow(in[i][0], 2) + pow(in[i][1], 2)),
 	big,
-	small,
-	mapValue(abs(z), small, big, 0.0, 255.0));
+	small);
+	*/
     
     al_draw_line(
 	posX + 0.5, 
 	posY, 
 	posX + 0.5, 
 	posY + 1, 
-	al_map_rgb(mapValue(abs(z), small, big, 0.0, 255.0),
-	  mapValue(abs(z), small, big, 0.0, 255.0), 
-	  mapValue(abs(z), small, big, 0.0, 255.0)), 
+	al_map_rgb(abs(z), abs(z), abs(z)), 
 	1);
     
     posX++;
@@ -221,8 +219,8 @@ int scaleFreq(fftw_complex *in, global *global)
     double r = sqrt(pow(posX, 2) + pow(posY, 2));
     if(r != 0.0)
     {
-      in[i][0] *= 1.0/pow(r, 2.0);
-      in[i][1] *= 1.0/pow(r, 2.0);
+      in[i][0] *= 1.0/pow(r, 1.8);
+      in[i][1] *= 1.0/pow(r, 1.8);
     }
     else
     {
@@ -294,14 +292,4 @@ int averageChannels(global *global)
     global->getImageBuffer()[i][0] /= global->getInInfo()->channels;
   }
   return 0;
-}
-
-float mapValue(float value, float oldMin, float oldMax, float newMin, float newMax)
-{
-  float oldRange = oldMax - oldMin;
-  float newRange = newMax - newMin;
-
-  float mapped = value - newMin / oldRange * newRange + newMin;
-
-  return mapped;
 }
