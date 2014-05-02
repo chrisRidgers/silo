@@ -166,6 +166,7 @@ int drawAllegro(fftw_complex *in, global *global)
   for(int i = 0; i < size; i++)
   {
     complex<double> z(in[i][0], in[i][1]);
+    /*
     fprintf(
 	stdout, 
 	"\
@@ -185,6 +186,7 @@ int drawAllegro(fftw_complex *in, global *global)
 	sqrt(pow(in[i][0], 2) + pow(in[i][1], 2)),
 	big,
 	small);
+	*/
     
     al_draw_line(
 	posX + 0.5, 
