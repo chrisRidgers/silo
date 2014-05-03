@@ -6,6 +6,9 @@ LIBS= `pkg-config --cflags --libs allegro-5 allegro_main-5 allegro_primitives-5`
 
 default: silo.out
 
+debug: COMPILE+= -g
+debug: silo.out
+
 silo.out: silo.o globals.o
 	$(CPP) -o silo.out globals.o silo.o $(LIB) $(LIBS) 
 

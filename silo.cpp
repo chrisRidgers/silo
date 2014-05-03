@@ -31,10 +31,10 @@ int main(int argc, char **argv)
   {
     complex<double> v(global.getImageBuffer2()[i][0], 
 	global.getImageBuffer2()[i][1]);
-    global.getImageBuffer2()[i][0] *= 1.0 / (abs(v));
-    global.getImageBuffer2()[i][0] *= 1.0 / (abs(v));
-    //global.getImageBuffer2()[i][1] *= 1.0 / (256 * 256);
-    //global.getImageBuffer2()[i][1] *= 1.0 / (256 * 256);
+    //global.getImageBuffer2()[i][0] *= 1.0 / (255.0);
+    //global.getImageBuffer2()[i][0] *= 1.0 / (255.0);
+    global.getImageBuffer2()[i][1] *= 1.0 / (256.0 * 256.0);
+    global.getImageBuffer2()[i][1] *= 1.0 / (256.0 * 256.0);
   }
   //drawAllegro(global.getImageBuffer2(), &global);
   
@@ -44,6 +44,7 @@ int main(int argc, char **argv)
 
   fftw_execute(*global.getPlan2());
   drawAllegro(global.getImageBuffer(), &global);
+  
 
   closeAllegro(&global);
 
@@ -160,7 +161,7 @@ int drawAllegro(fftw_complex *in, global *global)
 	small);
 
     double value;
-    map2range(abs(z), value, small, big, 0.0, 1.0); 
+    linearMap(abs(z), value, small, big, 0.0, 1.0); 
     al_draw_line(
 	posX + 0.5, 
 	posY, 
@@ -258,8 +259,8 @@ int printSoundInfo(SF_INFO *info)
 
 int averageChannels(global *global)
 {
-  float biggest = 0.0;
-  float smallest = 0.0;
+  double biggest = 0.0;
+  double smallest = 1.0;
   for(int i = 0; i < global->getHeight() * global->getWidth(); i++)
   {
     global->getImageBuffer()[i][0] = 0;
@@ -273,6 +274,7 @@ int averageChannels(global *global)
       //   global->getSoundSamplesBuffer()
       //  [i * global->getInInfo()->channels + ch]);
     }
+    
     global->getImageBuffer()[i][0] /= global->getInInfo()->channels;
 
     if(global->getImageBuffer()[i][0] > biggest) 
@@ -281,10 +283,17 @@ int averageChannels(global *global)
     if(global->getImageBuffer()[i][0] < smallest)
       smallest = global->getImageBuffer()[i][0];
 
-    global->getImageBuffer()[i][0] = (global->getImageBuffer()[i][0] - smallest) 
-      * ((1.0 - 0) / (1.0 - (-1.0))) + 0;
+   // fprintf(stdout, "%-15s\t:\t% f\n", "original", global->getImageBuffer()[i][0]);
+    
+  }
+  
+  for(int i = 0; i < global->getHeight() * global->getWidth(); i++)
+  {
+    double value;
+    linearMap(global->getImageBuffer()[i][0], value, smallest, biggest, 0.0, 255.0);
+    global->getImageBuffer()[i][0] = value;
 
-    fprintf(stdout, "i\t:\t%f\n", global->getImageBuffer()[i][0]);
+    //fprintf(stdout, "%-15s\t:\t% f\n", "mapped", global->getImageBuffer()[i][0]);
   }
 
 
@@ -292,7 +301,7 @@ int averageChannels(global *global)
   return 0;
 }
 
-int map2range(double value, double &result, double oldMin, double oldMax, double newMin, 
+int linearMap(double value, double &result, double oldMin, double oldMax, double newMin, 
     double newMax)
 { 
   result = (value - oldMin) * ((newMax - newMin) / (oldMax - oldMin)) + newMin;
