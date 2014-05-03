@@ -38,6 +38,7 @@ int main(int argc, char **argv)
   }
   //drawAllegro(global.getImageBuffer2(), &global);
   
+  
   scaleFreq(global.getImageBuffer2(), &global);
   //drawAllegro(global.getImageBuffer2(), &global);
 
@@ -54,7 +55,7 @@ int setupVariables(global *global)
   global->setWidth(256);
   global->setHeight(256);
 
-  global->setInfile(sf_open("music.wav", SFM_READ, global->getInInfo()));
+  global->setInfile(sf_open("music5.wav", SFM_READ, global->getInInfo()));
   //printSoundInfo(global->getInInfo());
 
   global->setMaxSeek(global->getInInfo()->frames - global->getWidth() 
