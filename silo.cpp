@@ -17,20 +17,32 @@ int main(int argc, char **argv)
   //generateLandscape(&global);
   
   sf_seek(global.getInfile(), global.getSeek(), SEEK_SET);
+  
   sf_read_float(global.getInfile(), global.getSoundSamplesBuffer(), 
       global.getWidth() * global.getHeight() * global.getInInfo()->channels);
   
   averageChannels(&global);
-  
   drawAllegro(global.getImageBuffer(), &global);
   
   fftw_execute(*global.getPlan());
-  drawAllegro(global.getImageBuffer2(), &global);
+  //drawAllegro(global.getImageBuffer2(), &global);
+  
+  for(int i = 0; i < global.getWidth() * global.getHeight(); i++)
+  {
+    complex<double> v(global.getImageBuffer2()[i][0], 
+	global.getImageBuffer2()[i][1]);
+    global.getImageBuffer2()[i][0] *= 1.0 / (abs(v));
+    global.getImageBuffer2()[i][0] *= 1.0 / (abs(v));
+    //global.getImageBuffer2()[i][1] *= 1.0 / (256 * 256);
+    //global.getImageBuffer2()[i][1] *= 1.0 / (256 * 256);
+  }
+  //drawAllegro(global.getImageBuffer2(), &global);
+  
   scaleFreq(global.getImageBuffer2(), &global);
-  drawAllegro(global.getImageBuffer2(), &global);
+  //drawAllegro(global.getImageBuffer2(), &global);
+
   fftw_execute(*global.getPlan2());
   drawAllegro(global.getImageBuffer(), &global);
-  
 
   closeAllegro(&global);
 
@@ -47,7 +59,7 @@ int setupVariables(global *global)
 
   global->setMaxSeek(global->getInInfo()->frames - global->getWidth() 
       * global->getHeight());
-  
+
   srand(time(NULL));
   global->setSeek(((float) global->getMaxSeek() * rand()) / RAND_MAX);
   global->setSoundSamplesBuffer(global->getWidth() * global->getHeight() 
@@ -69,7 +81,7 @@ int setupAllegro(global *global)
     fprintf(stderr, "failed to intialise allegro!\n");
     return -1;
   }
-  
+
   if(!al_init_primitives_addon())
   {
     fprintf(stderr, "failed to initialize allegro primitves \
@@ -91,55 +103,19 @@ int setupAllegro(global *global)
 
   return 0;
 }
-                                         /*
-int generateLandscape(global *global)
-{
-  fftw_complex  *in;
-  fftw_complex 	*out;
-  fftw_plan 	p, p2;
+/*
+   int generateLandscape(global *global)
+   {
 
-  in 	= (fftw_complex*) fftw_malloc(global->getWidth() * global->getHeight() 
-      * sizeof(fftw_complex));
-  out 	= (fftw_complex*) fftw_malloc(global->getWidth() * global->getHeight() 
-      * sizeof(fftw_complex));
-
-  srand(time(NULL));
-  for(int i = 0; i < global->getWidth() * global->getHeight(); i++)
-  {
-    in[i][0] = rand() % 255;
-    //cout << "in test " << i << " value: " << in[i] << endl;
-  }
-
-  //Draw values to allegro
-  drawAllegro(in, global->getWidth() * global->getHeight());
-
-  p = fftw_plan_dft_2d(global->getWidth(), global->getHeight(), in, out, 
-      FFTW_FORWARD, FFTW_ESTIMATE);
-  fftw_execute(p);
-
-  scaleFreq(out, global->getWidth() * global->getHeight());
-  drawAllegro(out, global->getWidth() * global->getHeight());
-
-  p2 = fftw_plan_dft_2d(global->getWidth(), global->getHeight(), out, in, 
-      FFTW_BACKWARD, FFTW_ESTIMATE);
-  fftw_execute(p2);
-
-  drawAllegro(in, global->getWidth() * global->getHeight());
-
-  normaliseImage(in, global->getWidth() * global->getHeight());
-
-  drawAllegro(in, global->getWidth() * global->getHeight());
+   fftw_destroy_plan(p);
+   fftw_destroy_plan(p2);
+   fftw_free(in);
+   fftw_free(out);
 
 
-  fftw_destroy_plan(p);
-  fftw_destroy_plan(p2);
-  fftw_free(in);
-  fftw_free(out);
-
-
-  return 0;
-}
-*/
+   return 0;
+   }
+   */
 
 int drawAllegro(fftw_complex *in, global *global)
 {
@@ -149,8 +125,8 @@ int drawAllegro(fftw_complex *in, global *global)
   int posX 	= 0;
   int posY 	= 0;
   float big 	= 0.0;
-  float small 	= 0.0;
-  
+  float small 	= 1.0;
+
   for(int i = 0; i < size; i++)
   {
     complex<double> z(in[i][0], in[i][1]);
@@ -161,7 +137,7 @@ int drawAllegro(fftw_complex *in, global *global)
   for(int i = 0; i < size; i++)
   {
     complex<double> z(in[i][0], in[i][1]);
-    /*
+
     fprintf(
 	stdout, 
 	"\
@@ -178,19 +154,23 @@ int drawAllegro(fftw_complex *in, global *global)
 	in[i][0],
 	in[i][1],
 	abs(z),
-	sqrt(pow(in[i][0], 2) + pow(in[i][1], 2)),
+	abs(z) / 256,
 	big,
 	small);
-	*/
-    
+
+    double value;
+    map2range(abs(z), value, small, big, 0.0, 1.0); 
     al_draw_line(
 	posX + 0.5, 
 	posY, 
 	posX + 0.5, 
 	posY + 1, 
-	al_map_rgb(abs(z), abs(z), abs(z)), 
+	al_map_rgb(
+	  value * 255, 
+	  value * 255, 
+	  value * 255), 
 	1);
-    
+
     posX++;
     if(posX > sizeX)
     {
@@ -219,8 +199,8 @@ int scaleFreq(fftw_complex *in, global *global)
     double r = sqrt(pow(posX, 2) + pow(posY, 2));
     if(r != 0.0)
     {
-      in[i][0] *= 1.0/pow(r, 1.8);
-      in[i][1] *= 1.0/pow(r, 1.8);
+      in[i][0] *= 1.0/pow(r, 1.4);
+      in[i][1] *= 1.0/pow(r, 1.4);
     }
     else
     {
@@ -277,6 +257,8 @@ int printSoundInfo(SF_INFO *info)
 
 int averageChannels(global *global)
 {
+  float biggest = 0.0;
+  float smallest = 0.0;
   for(int i = 0; i < global->getHeight() * global->getWidth(); i++)
   {
     global->getImageBuffer()[i][0] = 0;
@@ -284,12 +266,35 @@ int averageChannels(global *global)
     for(int ch = 0; ch < global->getInInfo()->channels ; ch++)
     {
       global->getImageBuffer()[i][0] += 
-	global->getSoundSamplesBuffer()[i * global->getInInfo()->channels + ch];
-      fprintf(stdout, "SoundSamplesBuffer()[i] : %f \n",
-	  global->getSoundSamplesBuffer()
-	  [i * global->getInInfo()->channels + ch]);
+	global->getSoundSamplesBuffer()
+	[i * global->getInInfo()->channels + ch];
+      //fprintf(stdout, "SoundSamplesBuffer()[i] : %f \n",
+      //   global->getSoundSamplesBuffer()
+      //  [i * global->getInInfo()->channels + ch]);
     }
     global->getImageBuffer()[i][0] /= global->getInInfo()->channels;
+
+    if(global->getImageBuffer()[i][0] > biggest) 
+      biggest = global->getImageBuffer()[i][0];
+
+    if(global->getImageBuffer()[i][0] < smallest)
+      smallest = global->getImageBuffer()[i][0];
+
+    global->getImageBuffer()[i][0] = (global->getImageBuffer()[i][0] - smallest) 
+      * ((1.0 - 0) / (1.0 - (-1.0))) + 0;
+
+    fprintf(stdout, "i\t:\t%f\n", global->getImageBuffer()[i][0]);
   }
+
+
+
+  return 0;
+}
+
+int map2range(double value, double &result, double oldMin, double oldMax, double newMin, 
+    double newMax)
+{ 
+  result = (value - oldMin) * ((newMax - newMin) / (oldMax - oldMin)) + newMin;
+
   return 0;
 }

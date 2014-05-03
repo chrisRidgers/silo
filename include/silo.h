@@ -10,6 +10,6 @@ int drawAllegro(fftw_complex *in, global *global);
 int scaleFreq(fftw_complex *in, global *global);
 int closeAllegro(global *global);
 int normaliseImage(fftw_complex *in, int size);
-float mapValue(float value, float oldMin, float oldMax, float newMin, float newMax);
+int map2range(double value, double &result, double oldMin, double oldMax, double newMin, double newMax);
 
 #endif
