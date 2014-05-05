@@ -5,7 +5,7 @@
 #include "globals.h"
 #include "landscape.h"
 
-landscape::landscape(struct global, int width, int height)
+landscape::landscape(struct global *global, int width, int height)
 {
   this->width 	= width;
   this->height 	= height;

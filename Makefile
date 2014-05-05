@@ -9,14 +9,11 @@ default: silo.out
 debug: COMPILE+= -g
 debug: silo.out
 
-silo.out: silo.o globals.o landscape.o
-	$(CPP) -o silo.out globals.o silo.o $(LIB) $(LIBS) 
+silo.out: silo.o landscape.o
+	$(CPP) -o silo.out landscape.o silo.o $(LIB) $(LIBS) 
 
 silo.o: silo.cpp
 	$(CPP) $(COMPILE) $(INCLUDE) silo.cpp -o silo.o
-
-globals.o: globals.cpp
-	$(CPP) $(COMPILE) $(INCLUDE) globals.cpp -o globals.o
 
 landscape.o: landscape.cpp
 	$(CPP) $(COMPILE) $(INCLUDE) landscape.cpp -o landscape.o

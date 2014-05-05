@@ -20,7 +20,7 @@ class landscape
   fftw_plan p, p2;
 
   public:
-  landscape(struct global, int width, int height);
+  landscape(struct global *global, int width, int height);
 
   int setWidth(int w);
   int setHeight(int h);
