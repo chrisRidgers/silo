@@ -21,6 +21,7 @@ class landscape
 
   public:
   landscape(struct global *global, int width, int height);
+  ~landscape();
 
   int setWidth(int w);
   int setHeight(int h);

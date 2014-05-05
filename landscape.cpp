@@ -11,6 +11,14 @@ landscape::landscape(struct global *global, int width, int height)
   this->height 	= height;
 }
 
+landscape::~landscape()
+{
+  fftw_destroy_plan(p);
+  fftw_destroy_plan(p2);
+  fftw_free(image);
+  fftw_free(image2);
+}
+
 int landscape::setWidth(int w)
 {
   width = w;

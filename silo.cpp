@@ -14,14 +14,23 @@ using namespace std;
 
 int main(int argc, char **argv)
 {
-  struct global global;
-  global.argc = argc;
-  global.argv = argv;
+  struct global global{
+    {
+      {"input",		required_argument, 0, 'i'},
+      {"output",	required_argument, 0, 'o'},
+      {"smoothness",	required_argument, 0, 's'},
+      {0, 0, 0, 0}
+    },
+      0,
+      argc,
+      argv
+  };
+
   landscape *test = new landscape(&global, 512, 512);
   setupVariables(&global, test);
-  
   generateLandscape(&global, test);
   delete test;
+
   closeAllegro(&global);
 
   return 0;
@@ -30,28 +39,20 @@ int main(int argc, char **argv)
 int setupVariables(global *global, landscape *test)
 {
   int c;
-  while(1)
+  while(( c = getopt_long(
+	  global->argc,
+	  global->argv,
+	  "i:o:s:",
+	  global->long_options,
+	  &global->option_index)) != -1)
   {
-    static struct option long_options[] =
-    {
-      {"input",		required_argument, 0, 'i'},
-      {"output",	required_argument, 0, 'o'},
-      {"smoothness",	required_argument, 0, 's'},
-      {0, 0, 0, 0}
-    };
-    int option_index = 0;
-
-    c = getopt_long (global->argc, global->argv, "i:o:s:", long_options, 
-	&option_index);
-
-    if(c == -1) break;
-
     switch(c)
     {
       case 0:
-	if(long_options[option_index].flag !=0) break;
+	if(global->long_options[global->option_index].flag !=0) break;
 
-	fprintf(stdout, "Option %s", long_options[option_index].name);
+	fprintf(stdout, "Option %s", 
+	    global->long_options[global->option_index].name);
 	if(optarg) fprintf(stdout, " with arg %s", optarg);
 	fprintf(stdout, "\n");
 	break;
@@ -93,7 +94,6 @@ int setupVariables(global *global, landscape *test)
   if(!global->smoothReceived || !test->getSmooth()
       || !global->inputReceived) exit(0);
 
-
   test->setWidth(512);
   test->setHeight(512);
 
@@ -104,7 +104,7 @@ int setupVariables(global *global, landscape *test)
     sf_close(test->getInfile());
     exit(0);
   }
-  //printSoundInfo(global->getInInfo());
+  //printSoundInfo(test->getInInfo());
 
   test->setMaxSeek(test->getInInfo()->frames - test->getWidth() 
       * test->getHeight());
@@ -119,7 +119,7 @@ int setupVariables(global *global, landscape *test)
   test->setPlan2();
 
   setupAllegro(global, test);
-  
+
 
   return 0;
 }
@@ -140,7 +140,7 @@ int setupAllegro(global *global, landscape *test)
   }
 
   global->display = al_create_display(test->getWidth(), 
-	test->getHeight());
+      test->getHeight());
 
   if(!global->display)
   {
@@ -149,7 +149,6 @@ int setupAllegro(global *global, landscape *test)
   }
   al_clear_to_color(al_map_rgb(0, 0, 0));
   al_flip_display();
-
 
   return 0;
 }
@@ -178,22 +177,14 @@ int generateLandscape(global *global, landscape *test)
   }
   //drawAllegro(global.getImageBuffer2(), &global);
 
-
   scaleFreq(test->getImageBuffer2(), global, test);
   //drawAllegro(global.getImageBuffer2(), &global);
 
   fftw_execute(*test->getPlan2());
   drawAllegro(test->getImageBuffer(), global, test);
 
-  fftw_destroy_plan(*test->getPlan());
-  fftw_destroy_plan(*test->getPlan2());
-  fftw_free(*test->getImageBuffer());
-  fftw_free(*test->getImageBuffer2());
-
-
   return 0;
 }
-
 
 int drawAllegro(fftw_complex *in, global *global, landscape *test)
 {
@@ -216,26 +207,26 @@ int drawAllegro(fftw_complex *in, global *global, landscape *test)
   {
     complex<double> z(in[i][0], in[i][1]);
     /*
-    fprintf(
-	stdout, 
-	"\
-	posX \t %d \n \
-	posY \t %d \n \
-	out[r] \t %f \n \
-	out[i] \t %f \n \
-	out[a] \t %f \n \
-	out[b] \t %f \n \
-	big \t %f \n \
-	small \t %f \n",
-	posX,
-	posY,
-	in[i][0],
-	in[i][1],
-	abs(z),
-	abs(z) / 512,
-	big,
-	small);
-	*/
+       fprintf(
+       stdout, 
+       "\
+       posX \t %d \n \
+       posY \t %d \n \
+       out[r] \t %f \n \
+       out[i] \t %f \n \
+       out[a] \t %f \n \
+       out[b] \t %f \n \
+       big \t %f \n \
+       small \t %f \n",
+       posX,
+       posY,
+       in[i][0],
+       in[i][1],
+       abs(z),
+       abs(z) / 512,
+       big,
+       small);
+       */
 
     double value;
     linearMap(abs(z), value, small, big, 0.0, 1.0); 
@@ -257,7 +248,6 @@ int drawAllegro(fftw_complex *in, global *global, landscape *test)
       posX = 0;
     }
   }
-
 
   al_flip_display();
   al_rest(5);
@@ -348,8 +338,8 @@ int averageChannels(global *global, landscape *test)
 	test->getSoundSamplesBuffer()
 	[i * test->getInInfo()->channels + ch];
       //fprintf(stdout, "SoundSamplesBuffer()[i] : %f \n",
-      //   global->getSoundSamplesBuffer()
-      //  [i * global->getInInfo()->channels + ch]);
+      //   test->getSoundSamplesBuffer()
+      //  [i * test->getInInfo()->channels + ch]);
     }
 
     test->getImageBuffer()[i][0] /= test->getInInfo()->channels;
@@ -360,26 +350,27 @@ int averageChannels(global *global, landscape *test)
     if(test->getImageBuffer()[i][0] < smallest)
       smallest = test->getImageBuffer()[i][0];
 
-    // fprintf(stdout, "%-15s\t:\t% f\n", "original", global->getImageBuffer()[i][0]);
+    // fprintf(stdout, "%-15s\t:\t% f\n", "original", 
+    // test->getImageBuffer()[i][0]);
 
   }
 
   for(int i = 0; i < test->getHeight() * test->getWidth(); i++)
   {
     double value;
-    linearMap(test->getImageBuffer()[i][0], value, smallest, biggest, 0.0, 255.0);
+    linearMap(test->getImageBuffer()[i][0], value, smallest, biggest, 0.0, 
+	255.0);
     test->getImageBuffer()[i][0] = value;
 
-    //fprintf(stdout, "%-15s\t:\t% f\n", "mapped", global->getImageBuffer()[i][0]);
+    //fprintf(stdout, "%-15s\t:\t% f\n", "mapped", 
+    //test->getImageBuffer()[i][0]);
   }
-
-
 
   return 0;
 }
 
-int linearMap(double value, double &result, double oldMin, double oldMax, double newMin, 
-    double newMax)
+int linearMap(double value, double &result, double oldMin, double oldMax, 
+    double newMin, double newMax)
 { 
   result = (value - oldMin) * ((newMax - newMin) / (oldMax - oldMin)) + newMin;
 
