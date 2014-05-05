@@ -1,16 +1,13 @@
-#ifndef GLOBAL
-#define GLOBAL
+#ifndef LANDSCAPE
+#define LANDSCAPE
 
-class global
+class landscape
 {
-  struct option long_options[4];
   int width;
   int height;
   char *input;
   char *output;
   float smooth;
-  
-  struct ALLEGRO_DISPLAY *display;
 
   SNDFILE *infile;
   SF_INFO inInfo;
@@ -23,7 +20,8 @@ class global
   fftw_plan p, p2;
 
   public:
-  global(){}
+  landscape(struct global, int width, int height);
+
   int setWidth(int w);
   int setHeight(int h);
   int setInput(char *i);
@@ -35,9 +33,6 @@ class global
   char** getOutput();
   float getSmooth();
 
-  int setDisplay(ALLEGRO_DISPLAY *d);
-  ALLEGRO_DISPLAY* getDisplay();
-
   int setInfile(SNDFILE *i);
   int setInInfo(SF_INFO);
   int setMaxSeek(long s);
@@ -45,7 +40,9 @@ class global
   int setSoundSamplesBuffer(long frames);
   int setImageBuffer(int samples);
   int setImageBuffer2(int samples);
-  
+  int setPlan();
+  int setPlan2();
+
   SNDFILE* getInfile();
   SF_INFO* getInInfo();
   long getMaxSeek();
@@ -53,16 +50,7 @@ class global
   float* getSoundSamplesBuffer();
   fftw_complex* getImageBuffer();
   fftw_complex* getImageBuffer2();
-  int setPlan();
   fftw_plan* getPlan();
-  int setPlan2();
   fftw_plan* getPlan2();
-
-  char **argv;
-  int argc;
-  int inputReceived;
-  int smoothReceived;
- 
 };
-
 #endif

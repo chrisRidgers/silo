@@ -1,3 +1,4 @@
+#include <getopt.h>
 #include <fftw3.h>
 #include <sndfile.h>
 #include <allegro5/allegro.h>

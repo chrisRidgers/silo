@@ -7,6 +7,7 @@
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_primitives.h>
 #include "globals.h"
+#include "landscape.h"
 #include "silo.h"
 
 using namespace std;
@@ -56,6 +57,7 @@ int setupVariables(global *global)
 
       case 'i':
 	fprintf(stdout, "Option -i with value `%s'\n", optarg);
+	global->inputReceived = 1;
 	global->setInput(optarg);
 	break;
 
@@ -66,6 +68,7 @@ int setupVariables(global *global)
 
       case 's':
 	fprintf(stdout, "Option -s with value `%s'\n", optarg);
+	global->smoothReceived = 1;
 	global->setSmooth(atof(optarg));
 	break;
 
@@ -86,11 +89,22 @@ int setupVariables(global *global)
     exit(0);
   }
 
+  if(!global->smoothReceived || !global->getSmooth()
+      || !global->inputReceived) exit(0);
+
+  landscape test = new landscape(global, 512, 512);
+  delete test;
 
   global->setWidth(512);
   global->setHeight(512);
 
   global->setInfile(sf_open(*global->getInput(), SFM_READ, global->getInInfo()));
+  if(!global->getInfile()) 
+  {
+    fprintf(stderr, "Invalid input file\n");
+    sf_close(global->getInfile());
+    exit(0);
+  }
   //printSoundInfo(global->getInInfo());
 
   global->setMaxSeek(global->getInInfo()->frames - global->getWidth() 
