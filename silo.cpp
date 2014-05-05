@@ -201,7 +201,7 @@ int drawAllegro(fftw_complex *in, global *global)
   for(int i = 0; i < size; i++)
   {
     complex<double> z(in[i][0], in[i][1]);
-
+    /*
     fprintf(
 	stdout, 
 	"\
@@ -221,6 +221,7 @@ int drawAllegro(fftw_complex *in, global *global)
 	abs(z) / 512,
 	big,
 	small);
+	*/
 
     double value;
     linearMap(abs(z), value, small, big, 0.0, 1.0); 
