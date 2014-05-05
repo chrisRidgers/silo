@@ -5,6 +5,9 @@ class global
 {
   int width;
   int height;
+  char *input;
+  char *output;
+  float smooth;
   
   struct ALLEGRO_DISPLAY *display;
 
@@ -22,8 +25,14 @@ class global
   global(){}
   int setWidth(int w);
   int setHeight(int h);
+  int setInput(char *i);
+  int setOutput(char *o);
+  int setSmooth(float s);
   int getWidth();
   int getHeight();
+  char** getInput();
+  char** getOutput();
+  float getSmooth();
 
   int setDisplay(ALLEGRO_DISPLAY *d);
   ALLEGRO_DISPLAY* getDisplay();
@@ -47,6 +56,9 @@ class global
   fftw_plan* getPlan();
   int setPlan2();
   fftw_plan* getPlan2();
+
+  char **argv;
+  int argc;
  
 };
 

@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <getopt.h>
 #include <complex.h>
 #include <time.h>
 #include <fftw3.h>
@@ -13,39 +14,12 @@ using namespace std;
 int main(int argc, char **argv)
 {
   global global;
+  global.argc = argc;
+  global.argv = argv;
   setupVariables(&global);
-  //generateLandscape(&global);
-  
-  sf_seek(global.getInfile(), global.getSeek(), SEEK_SET);
-  
-  sf_read_float(global.getInfile(), global.getSoundSamplesBuffer(), 
-      global.getWidth() * global.getHeight() * global.getInInfo()->channels);
-  
-  averageChannels(&global);
-  drawAllegro(global.getImageBuffer(), &global);
-  
-  fftw_execute(*global.getPlan());
-  //drawAllegro(global.getImageBuffer2(), &global);
-  
-  for(int i = 0; i < global.getWidth() * global.getHeight(); i++)
-  {
-    complex<double> v(global.getImageBuffer2()[i][0], 
-	global.getImageBuffer2()[i][1]);
-    //global.getImageBuffer2()[i][0] *= 1.0 / (255.0);
-    //global.getImageBuffer2()[i][0] *= 1.0 / (255.0);
-    global.getImageBuffer2()[i][1] *= 1.0 / (256.0 * 256.0);
-    global.getImageBuffer2()[i][1] *= 1.0 / (256.0 * 256.0);
-  }
-  //drawAllegro(global.getImageBuffer2(), &global);
   
   
-  scaleFreq(global.getImageBuffer2(), &global);
-  //drawAllegro(global.getImageBuffer2(), &global);
-
-  fftw_execute(*global.getPlan2());
-  drawAllegro(global.getImageBuffer(), &global);
-  
-
+  generateLandscape(&global);
   closeAllegro(&global);
 
   return 0;
@@ -53,10 +27,70 @@ int main(int argc, char **argv)
 
 int setupVariables(global *global)
 {
-  global->setWidth(256);
-  global->setHeight(256);
+  int c;
+  while(1)
+  {
+    static struct option long_options[] =
+    {
+      {"input",		required_argument, 0, 'i'},
+      {"output",	required_argument, 0, 'o'},
+      {"smoothness",	required_argument, 0, 's'},
+      {0, 0, 0, 0}
+    };
+    int option_index = 0;
 
-  global->setInfile(sf_open("music5.wav", SFM_READ, global->getInInfo()));
+    c = getopt_long (global->argc, global->argv, "i:o:s:", long_options, 
+	&option_index);
+
+    if(c == -1) break;
+
+    switch(c)
+    {
+      case 0:
+	if(long_options[option_index].flag !=0) break;
+
+	fprintf(stdout, "Option %s", long_options[option_index].name);
+	if(optarg) fprintf(stdout, " with arg %s", optarg);
+	fprintf(stdout, "\n");
+	break;
+
+      case 'i':
+	fprintf(stdout, "Option -i with value `%s'\n", optarg);
+	global->setInput(optarg);
+	break;
+
+      case 'o':
+	fprintf(stdout, "Option -o with value `%s'\n",optarg);
+	global->setOutput(optarg);
+	break;
+
+      case 's':
+	fprintf(stdout, "Option -s with value `%s'\n", optarg);
+	global->setSmooth(atof(optarg));
+	break;
+
+      case '?':
+	break;
+
+      default:
+	abort();
+    }
+  }
+
+  if(optind < global->argc)
+  {
+    fprintf(stderr, "non-option ARGV-elements: ");
+    while(optind < global->argc)
+      fprintf(stderr, "%s ", global->argv[optind++]);
+    fputc('\n', stderr);
+    exit(0);
+  }
+
+
+  global->setWidth(512);
+  global->setHeight(512);
+
+  global->setInfile(sf_open(*global->getInput(), SFM_READ, global->getInInfo()));
   //printSoundInfo(global->getInInfo());
 
   global->setMaxSeek(global->getInInfo()->frames - global->getWidth() 
@@ -105,19 +139,47 @@ int setupAllegro(global *global)
 
   return 0;
 }
-/*
-   int generateLandscape(global *global)
-   {
 
-   fftw_destroy_plan(p);
-   fftw_destroy_plan(p2);
-   fftw_free(in);
-   fftw_free(out);
+int generateLandscape(global *global)
+{
+  sf_seek(global->getInfile(), global->getSeek(), SEEK_SET);
+
+  sf_read_float(global->getInfile(), global->getSoundSamplesBuffer(), 
+      global->getWidth() * global->getHeight() * global->getInInfo()->channels);
+
+  averageChannels(global);
+  drawAllegro(global->getImageBuffer(), global);
+
+  fftw_execute(*global->getPlan());
+  //drawAllegro(global.getImageBuffer2(), &global);
+
+  for(int i = 0; i < global->getWidth() * global->getHeight(); i++)
+  {
+    complex<double> v(global->getImageBuffer2()[i][0], 
+	global->getImageBuffer2()[i][1]);
+    global->getImageBuffer2()[i][1] *= 1.0 / 
+      (global->getWidth() * global->getHeight());
+    global->getImageBuffer2()[i][1] *= 1.0 / 
+      (global->getWidth() * global->getHeight());
+  }
+  //drawAllegro(global.getImageBuffer2(), &global);
 
 
-   return 0;
-   }
-   */
+  scaleFreq(global->getImageBuffer2(), global);
+  //drawAllegro(global.getImageBuffer2(), &global);
+
+  fftw_execute(*global->getPlan2());
+  drawAllegro(global->getImageBuffer(), global);
+
+  fftw_destroy_plan(*global->getPlan());
+  fftw_destroy_plan(*global->getPlan2());
+  fftw_free(*global->getImageBuffer());
+  fftw_free(*global->getImageBuffer2());
+
+
+  return 0;
+}
+
 
 int drawAllegro(fftw_complex *in, global *global)
 {
@@ -156,7 +218,7 @@ int drawAllegro(fftw_complex *in, global *global)
 	in[i][0],
 	in[i][1],
 	abs(z),
-	abs(z) / 256,
+	abs(z) / 512,
 	big,
 	small);
 
@@ -201,8 +263,8 @@ int scaleFreq(fftw_complex *in, global *global)
     double r = sqrt(pow(posX, 2) + pow(posY, 2));
     if(r != 0.0)
     {
-      in[i][0] *= 1.0/pow(r, 1.4);
-      in[i][1] *= 1.0/pow(r, 1.4);
+      in[i][0] *= 1.0/pow(r, global->getSmooth());
+      in[i][1] *= 1.0/pow(r, global->getSmooth());
     }
     else
     {
@@ -274,7 +336,7 @@ int averageChannels(global *global)
       //   global->getSoundSamplesBuffer()
       //  [i * global->getInInfo()->channels + ch]);
     }
-    
+
     global->getImageBuffer()[i][0] /= global->getInInfo()->channels;
 
     if(global->getImageBuffer()[i][0] > biggest) 
@@ -283,10 +345,10 @@ int averageChannels(global *global)
     if(global->getImageBuffer()[i][0] < smallest)
       smallest = global->getImageBuffer()[i][0];
 
-   // fprintf(stdout, "%-15s\t:\t% f\n", "original", global->getImageBuffer()[i][0]);
-    
+    // fprintf(stdout, "%-15s\t:\t% f\n", "original", global->getImageBuffer()[i][0]);
+
   }
-  
+
   for(int i = 0; i < global->getHeight() * global->getWidth(); i++)
   {
     double value;

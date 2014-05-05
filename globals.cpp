@@ -17,6 +17,27 @@ int global::setHeight(int h)
   return 0;
 }
 
+int global::setInput(char *i)
+{
+  input = i;
+
+  return 0;
+}
+
+int global::setOutput(char *o)
+{
+  output = o;
+
+  return 0;
+}
+
+int global::setSmooth(float s)
+{
+  smooth = s;
+
+  return 0;
+}
+
 int global::getWidth()
 {
   return width;
@@ -25,6 +46,21 @@ int global::getWidth()
 int global::getHeight()
 {
   return height;
+}
+
+char**  global::getInput()
+{
+  return &input;
+}
+
+char** global::getOutput()
+{
+  return &output;
+}
+
+float global::getSmooth()
+{
+  return smooth;
 }
 
 int global::setDisplay(ALLEGRO_DISPLAY *d)
