@@ -164,21 +164,21 @@ int generateLandscape(global *global, landscape *test)
   drawAllegro(test->getImageBuffer(), global, test);
 
   fftw_execute(*test->getPlan());
-  //drawAllegro(global.getImageBuffer2(), &global);
+  //drawAllegro(test->getImageBuffer2(), global, test);
 
   for(int i = 0; i < test->getWidth() * test->getHeight(); i++)
   {
     complex<double> v(test->getImageBuffer2()[i][0], 
 	test->getImageBuffer2()[i][1]);
     test->getImageBuffer2()[i][1] *= 1.0 / 
-      (test->getWidth() * test->getHeight());
+      sqrt((test->getWidth() * test->getHeight()));
     test->getImageBuffer2()[i][1] *= 1.0 / 
-      (test->getWidth() * test->getHeight());
+      sqrt((test->getWidth() * test->getHeight()));
   }
-  //drawAllegro(global.getImageBuffer2(), &global);
+  //drawAllegro(test->getImageBuffer2(), global, test);
 
   scaleFreq(test->getImageBuffer2(), global, test);
-  //drawAllegro(global.getImageBuffer2(), &global);
+  //drawAllegro(test->getImageBuffer2(), global, test);
 
   fftw_execute(*test->getPlan2());
   drawAllegro(test->getImageBuffer(), global, test);
