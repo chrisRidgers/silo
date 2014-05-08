@@ -1,0 +1,106 @@
+pLEASE FORWARD ALL FEEDBACK TO V6C13@STUDENTS.KEELE.AC.UK, IN THE FORM OF A 
+PLAIN TEXT DOCUMENT.  iN DOING SO, IT IMPLIES CONSENT TO BEING MENTIONED 
+ANONYMOUSLY IN A PROJECT REPORT.
+
+This software uses the following libraries, which you will need installed
+on your computer to work.
+
+allegro5.1
+libsndfile
+fftw3
+
+It's reccommended that you install these to your system using your
+distributions package manager, or on OSX Homebrew.
+
+If this isn't an option, the various vendors websites are listed below:
+
+http://sourceforge.net/projects/alleg/files/allegro-unstable/5.1.8
+http://www.mega-nerd.com/libsndfile/#Download
+http://www.fftw.org/download.html
+
+
+
+
+In order to compile the software, run the make command from the terminal.
+
+
+
+
+
+
+
+Using SILO
+
+SILO's input structure is:
+
+./silo.out -i input.wav -s 1.4
+
+
+At the moment, only wav files are officially supported but feel free to test 
+other file types and let me know the results.  MP3 will not work, and will cause
+the world to stop spinning should you attempt to use one.  You have been warned.
+
+
+The -s value is a 'smoothness' value, feel free to alter it however you like.
+Again if it does break, please let me know :)
+
+SILO outputs .obj files to the output directory, which can be perused at your
+leisure using a 3D Software package such as Blender.  If you achieve any 
+interesting results, please consider screen shotting them to me.
+
+
+
+
+
+
+
+
+
+EVALUATION
+
+
+Once the software is up and running, please spend 10 - 15 minutes experimenting
+with different input files and parameter files and observing the results.
+
+Once you have finished, please match the following values to the staments as 
+closely as possible:
+
+1. Do not agree		2. Somewhat disagree.	3. Neither Agree or disagree	4. Somewhat Agree	5.Agree
+
+
+
+I am experienced in using 3D objects in computer environments:
+
+I am computer literate:
+
+I have built 3D terrains using software before:
+
+I have a vested interest in computer generated landsapes:
+
+I am aware of the industries of which subjects such as computer generated
+landscapes are used:
+
+I am a consumer of the prouduts produced by these industries:
+
+I have worked with sound digitally to a degree of competency:
+
+I have practiced Fourier Analysis of an audio spectrum before:
+
+I understand what the software is doing:
+
+I understand the resulting output from the software:
+
+
+
+
+
+
+
+In addition, please state a 3 -5 sentences about your experience using this 
+software.  Feel free to mention any difficulties you encountered, crashes, 
+errors etc.
+
+
+pLEASE FORWARD ALL FEEDBACK TO V6C13@STUDENTS.KEELE.AC.UK, IN THE FORM OF A 
+PLAIN TEXT DOCUMENT.  iN DOING SO, IT IMPLIES CONSENT TO BEING MENTIONED 
+ANONYMOUSLY IN A PROJECT REPORT.
