@@ -53,7 +53,7 @@ int main(int argc, char **argv)
 
   //Defines file output path based on time
   time_t t = time(0);
-  struct tm * now = localtime(&t);
+  struct tm *now = localtime(&t);
   stringstream ss;
   ss 
     << now->tm_mday 

@@ -1,12 +1,15 @@
 #ifndef LANDSCAPE
 #define LANDSCAPE
 
+using namespace std;
+
 class landscape
 {
   int width;
   int height;
-  char *input;
-  char *output;
+  int size;
+  string input;
+  string output;
   float smooth;
 
   SNDFILE *infile;
@@ -19,6 +22,8 @@ class landscape
   fftw_complex *image2;
   fftw_plan p, p2;
 
+  vector<vector<double>> object;
+
   public:
   landscape(struct global *global, int width, int height);
   ~landscape();
@@ -30,8 +35,8 @@ class landscape
   int setSmooth(float s);
   int getWidth();
   int getHeight();
-  char** getInput();
-  char** getOutput();
+  string getInput();
+  string getOutput();
   float getSmooth();
 
   int setInfile(SNDFILE *i);
@@ -53,5 +58,9 @@ class landscape
   fftw_complex* getImageBuffer2();
   fftw_plan* getPlan();
   fftw_plan* getPlan2();
+
+  int setupVerts();
+  int saveLandscape(global *global);
+  int setHeights(global *global);
 };
 #endif

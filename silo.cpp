@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <string>
+#include <vector>
 #include <getopt.h>
 #include <complex.h>
 #include <time.h>
@@ -29,6 +31,7 @@ int main(int argc, char **argv)
   landscape *test = new landscape(&global, 512, 512);
   setupVariables(&global, test);
   generateLandscape(&global, test);
+  test->saveLandscape(&global);
   delete test;
 
   closeAllegro(&global);
@@ -65,6 +68,7 @@ int setupVariables(global *global, landscape *test)
 
       case 'o':
 	fprintf(stdout, "Option -o with value `%s'\n",optarg);
+	global->smoothReceived = 1;
 	test->setOutput(optarg);
 	break;
 
@@ -97,7 +101,8 @@ int setupVariables(global *global, landscape *test)
   test->setWidth(512);
   test->setHeight(512);
 
-  test->setInfile(sf_open(*test->getInput(), SFM_READ, test->getInInfo()));
+  test->setInfile(sf_open(test->getInput().c_str(), SFM_READ, 
+	test->getInInfo()));
   if(!test->getInfile()) 
   {
     fprintf(stderr, "Invalid input file\n");
@@ -118,6 +123,7 @@ int setupVariables(global *global, landscape *test)
   test->setPlan();
   test->setPlan2();
 
+  
   setupAllegro(global, test);
 
 
@@ -182,6 +188,8 @@ int generateLandscape(global *global, landscape *test)
 
   fftw_execute(*test->getPlan2());
   drawAllegro(test->getImageBuffer(), global, test);
+
+  test->setHeights(global);
 
   return 0;
 }

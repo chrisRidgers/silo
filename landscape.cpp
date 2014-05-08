@@ -1,14 +1,45 @@
+#include <complex.h>
+#include <string>
+#include <iostream>
+#include <sstream>
+#include <fstream>
+#include <vector>
 #include <fftw3.h>
 #include <sndfile.h>
 #include <allegro5/allegro.h>
 #include <getopt.h>
 #include "globals.h"
 #include "landscape.h"
+#include "silo.h"
 
 landscape::landscape(struct global *global, int width, int height)
 {
   this->width 	= width;
   this->height 	= height;
+  this->size 	= this->width * this->height;
+  this->output	= "output/";
+
+  //Defines file output path based on time
+  time_t t = time(0);
+  struct tm *now = localtime(&t);
+  stringstream ss;
+  ss 
+    << now->tm_mday 
+    << now->tm_mon+1 
+    << now->tm_year+1900 
+    << now->tm_hour 
+    << now->tm_min 
+    << now->tm_sec
+    << ".obj";
+  output += ss.str();
+
+  object.resize(size);
+  for(int i = 0; i < object.size(); i++)
+  {
+    object[i].resize(3);
+  }
+
+  landscape::setupVerts();
 }
 
 landscape::~landscape()
@@ -35,14 +66,14 @@ int landscape::setHeight(int h)
 
 int landscape::setInput(char *i)
 {
-  input = i;
+  input = string(i);
 
   return 0;
 }
 
 int landscape::setOutput(char *o)
 {
-  output = o;
+  output = string(o);
 
   return 0;
 }
@@ -64,14 +95,14 @@ int landscape::getHeight()
   return height;
 }
 
-char**  landscape::getInput()
+string landscape::getInput()
 {
-  return &input;
+  return input;
 }
 
-char** landscape::getOutput()
+string landscape::getOutput()
 {
-  return &output;
+  return output;
 }
 
 float landscape::getSmooth()
@@ -185,4 +216,92 @@ int landscape::setPlan2()
 fftw_plan* landscape::getPlan2()
 {
   return &p2;
+}
+
+int landscape::setupVerts()
+{
+  int countX = 0;
+  int countY = 0;
+
+  for(int i = 0; i < object.size(); i++)
+  {
+    object[i][0] = (double)countX / 32.0;
+    object[i][1] = (double)countY / 32.0;
+
+    countX++;
+    if(countX >= width)
+    {
+      countY++;
+      countX = 0;
+    }
+  }
+
+  return 0;
+}
+
+int landscape::saveLandscape(global *global)
+{
+  ofstream outputStream;
+  //cout << "Landscape Test1" << endl;
+  outputStream.open(output);
+  if(outputStream.is_open())
+  {
+    //cout << "Landscape Test2" << endl;
+    //output << "Hello File World!\n";
+  }else
+  {
+    return 1;
+  }
+
+  for(int i=0; i<object.size(); i++)
+  {
+    //cout << "v\t" << vert[0] << "\t" << vert[1] << "\t" << vert[2] << "\n";
+    outputStream << "v\t" << object[i][0] << "\t" << object[i][1] << "\t" 
+      << object[i][2] << "\n";
+  }
+
+  outputStream<< "\n";
+  /*
+     for(int i=1; i<sizeX*sizeY-sizeX; i++)
+     {
+     cout << "f\t" << i << " " << i+sizeX << " " << i+sizeX+1 << " " << i+1 
+     << " \n";
+     output << "f\t" << i << " " << i+sizeX << " " << i+sizeX+1 << " " << i+1 
+     << " \n";
+     }
+     */
+  for(int i=1; i<object.size()-width-1; i++)
+  { 
+    if(i%width!=0)outputStream << "f\t" << i << " " << i+width<< " " 
+      << i+width+1 << " " << i+1 << " \n"; 
+  }
+  outputStream.close();
+  return 0;
+}
+
+int landscape::setHeights(global *global)
+{
+  float little 	= 1.0;
+  float big	= 0.0;
+  
+  for(int i = 0; i < size; i++)
+  {
+    complex<double> v(image[i][0], image[i][1]);
+    double value;
+    ::linearMap(abs(v), value, little, big, 0, 1.0);
+
+    little 	= (little < value) ? value : little;
+    big 	= (big < value) ? big : value;
+  }
+
+
+  for(int i = 0; i < size; i++)
+  {
+    complex<double> v(image[i][0], image[i][1]);
+    double value;
+    ::linearMap(abs(v), value, little, big, 0, 1.0);
+    object[i][2] = value;
+  }
+
+  return 0;
 }
